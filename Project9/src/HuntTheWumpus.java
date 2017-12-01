@@ -19,53 +19,74 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-public class HuntTheWumpus extends JPanel implements MouseListener{
+public class HuntTheWumpus extends JPanel{
 	Map m;
 	int x,y;
 	Vertex v;
 	JPanel handler;
 	CardLayout card;
+	Time t;
+	JFrame j;
 	
 	public HuntTheWumpus() {	
 		card = new CardLayout();
-		JFrame j = new JFrame();
+		j = new JFrame();
 		j.setSize(1000,800);
 		handler = new JPanel();
 		handler.setLayout(card);
 		handler.add(new Open(this), "Open");
 		handler.add(this, "Main");
-		create();
 		j.add(handler);
-		j.addMouseListener(this);
 		setVisible(true);
 		j.setVisible(true);
 		card.show(handler, "Open");
 		String MOVE = "move";
-		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), MOVE);
-		this.getActionMap().put(MOVE, new AbstractAction() {	
+		j.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), MOVE);
+		j.getRootPane().getActionMap().put(MOVE, new AbstractAction() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {v = v.move();System.out.println("Key");}});
 		String CHEAT = "cheat";
-		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), CHEAT);
-		this.getActionMap().put(CHEAT, new AbstractAction() {	
+		j.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), CHEAT);
+		j.getRootPane().getActionMap().put(CHEAT, new AbstractAction() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {Vertex.cheat = !Vertex.cheat;System.out.println("cheat");}});
 		String SHOOT = "shoot";
-		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), SHOOT);
-		this.getActionMap().put(SHOOT, new AbstractAction() {	
+		j.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), SHOOT);
+		j.getRootPane().getActionMap().put(SHOOT, new AbstractAction() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {Vertex.shooting = !Vertex.shooting;System.out.println("shoot");}});
+		String UP = "up";
+		j.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), UP);
+		j.getRootPane().getActionMap().put(UP, new AbstractAction() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {v = v.up(true);System.out.println("up");}});
+		String DOWN = "down";
+		j.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("X"), DOWN);
+		j.getRootPane().getActionMap().put(DOWN, new AbstractAction() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {v = v.up(false);System.out.println("down");}});
 	}
 	
 	public void create() {
-		m = new Map(20);
+		m = new Map(10);
 		v = m.getOn();
 		new Time();
 		card.show(handler, "Main");
 	}
 	
 	public void create(String fileName) {
+		if(fileName.contains(".")) {
 		m = new Map(fileName);
+		}
+		else {
+			String[] strs = fileName.split("[x]");
+			if(strs.length == 1) {
+				m = new Map(Integer.parseInt(strs[0]));
+			}
+			else {
+				m = new Map(Integer.parseInt(strs[0]),Integer.parseInt(strs[1]));
+			}
+		}
 		v = m.getOn();
 		new Time();
 		card.show(handler, "Main");
@@ -87,11 +108,14 @@ public class HuntTheWumpus extends JPanel implements MouseListener{
 		if(v!=null) {
 		v.visited = true;
 		v.paintComponent(g);
+		g.setColor(m.getWumpus().z == v.z ? Color.RED : Color.BLACK);
 		g.fillRect(740, 540, 220, 220);
 		for(int i = 0; i < m.getMap().length; i ++) {
 			for(int j = 0; j < m.getMap()[i].length; j ++) {
-				if(m.getMap()[i][j] != null)
-					m.getMap()[i][j].draw(g, 750 + 200/m.getMap().length*i, 550 + 200/m.getMap()[i].length*j, 200/m.getMap().length);
+				if(m.getMap()[i][j][v.z] != null)
+					m.getMap()[i][j][v.z].draw(g, 750 + 200/m.getMap().length*i, 550 + 200/m.getMap()[i].length*j, 200/m.getMap().length);
+				else
+					Vertex.drawNull(g, 750 + 200/m.getMap().length*i, 550 + 200/m.getMap()[i].length*j, 200/m.getMap().length);
 			}
 		}
 		}
@@ -106,9 +130,10 @@ public class HuntTheWumpus extends JPanel implements MouseListener{
 		
 		public void run() {
 			while(true) {
-				repaint();
 				//System.out.println(getMousePosition().getX());
-				Point p = getMousePosition();
+				if(v!= null) {
+					repaint();
+				Point p = j.getMousePosition();
 				if(p != null) {
 				if(p.getX() > 900) {
 					v.right();
@@ -118,9 +143,9 @@ public class HuntTheWumpus extends JPanel implements MouseListener{
 				}
 				else {
 					v.stop();
-				}}
+				}}}
 				try {
-					t.sleep(20);
+					  t.sleep(50);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -136,42 +161,13 @@ public class HuntTheWumpus extends JPanel implements MouseListener{
 	public static void main(String [] args) {
 		HuntTheWumpus h = new HuntTheWumpus();
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	private class Open extends JPanel implements ActionListener{
 		JButton start;
 		JTextField text;
 		HuntTheWumpus h;
 		public Open(HuntTheWumpus h) {
+			setBackground(Color.BLACK);
 			setLayout(new BorderLayout());
 			JLabel l = new JLabel("Hunt The Wumpus");
 			l.setFont(new Font(Font.SANS_SERIF, 0, 72));
@@ -199,6 +195,8 @@ public class HuntTheWumpus extends JPanel implements MouseListener{
 				else {
 					create();
 				}
+				start.setEnabled(false);
+				text.setEnabled(false);
 			}
 		}
 	}

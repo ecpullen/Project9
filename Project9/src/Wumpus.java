@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 
 public class Wumpus extends Vertex implements Drawable{
 	boolean dead;
-	public Wumpus(int x, int y) {
-		super(x,y);
+	public Wumpus(int x, int y, int z) {
+		super(x,y,z);
 		System.out.println(x + " " + y);
 		visited = true;
 	}
@@ -19,6 +19,11 @@ public class Wumpus extends Vertex implements Drawable{
 		try {
 			g.drawImage(ImageIO.read(new File("src/Wumpus.png")), x, y, scale, scale, null);
 		} catch (IOException e) {System.out.println(e);}
+		else {
+			g.setColor(Map.size == 0 ? Color.BLACK : Color.DARK_GRAY);
+			g.fillRect(x,y,scale,scale);
+			g.setColor(Color.black);
+		}
 	}
 	
 	public void paintComponent(Graphics g) {

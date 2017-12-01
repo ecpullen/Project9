@@ -61,21 +61,21 @@ public class Image {
 	static final Color HUNTER = new Color(255,0,0);
 	static final Color ROOM = Color.black;
 	
-	public Vertex[][] getMap() {//Creates a new landscape based on image
-		Vertex[][] t = new Vertex[image.length][image[0].length];
+	public Vertex[][][] getMap() {//Creates a new landscape based on image
+		Vertex[][][] t = new Vertex[image.length][image[0].length][1];
 		for(int i = 0; i < image.length; i ++) {
 			for(int j = 0; j < image[0].length; j++) {
 				Color temp = image[i][j];
 				if(Math.sqrt((temp.getRed()-WUMPUS.getRed())*(temp.getRed()-WUMPUS.getRed())+(temp.getBlue()-WUMPUS.getBlue())*(temp.getBlue()-WUMPUS.getBlue())+(temp.getGreen()-WUMPUS.getGreen())*(temp.getGreen()-WUMPUS.getGreen())) < 25) {
-					t[i][j] = new Wumpus(i,j);
+					t[i][j][0] = new Wumpus(i,j,0);
 					System.out.println("Wumpus");
 				}
 				if(Math.sqrt((temp.getRed()-HUNTER.getRed())*(temp.getRed()-HUNTER.getRed())+(temp.getBlue()-HUNTER.getBlue())*(temp.getBlue()-HUNTER.getBlue())+(temp.getGreen()-HUNTER.getGreen())*(temp.getGreen()-HUNTER.getGreen())) < 25) {
-					t[i][j] = new Vertex(i,j);
-					t[i][j].occupied = true;
+					t[i][j][0] = new Vertex(i,j,0);
+					t[i][j][0].occupied = true;
 				}
 				if(Math.sqrt((temp.getRed()-ROOM.getRed())*(temp.getRed()-ROOM.getRed())+(temp.getBlue()-ROOM.getBlue())*(temp.getBlue()-ROOM.getBlue())+(temp.getGreen()-ROOM.getGreen())*(temp.getGreen()-ROOM.getGreen())) < 25) {
-					t[i][j] = new Vertex(i,j);
+					t[i][j][0] = new Vertex(i,j,0);
 				}
 			}
 		}
